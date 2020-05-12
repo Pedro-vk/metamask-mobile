@@ -344,7 +344,7 @@ class Approve extends PureComponent {
 		customGasSelected: 'average',
 		customGas: undefined,
 		customGasPrice: undefined,
-		customGasModalVisible: false,
+		customGasVisible: false,
 		editPermissionVisible: false,
 		gasError: undefined,
 		host: undefined,
@@ -415,10 +415,11 @@ class Approve extends PureComponent {
 		this.setState({ viewDetails: !viewDetails });
 	};
 
-	toggleCustomGasModal = () => {
-		const { customGasModalVisible } = this.state;
-		!customGasModalVisible && this.trackApproveEvent(ANALYTICS_EVENT_OPTS.DAPP_APPROVE_SCREEN_EDIT_FEE);
-		this.setState({ customGasModalVisible: !customGasModalVisible, gasError: undefined });
+	toggleCustomGas = () => {
+		console.log('toggleCustomGas');
+		const { customGasVisible } = this.state;
+		!customGasVisible && this.trackApproveEvent(ANALYTICS_EVENT_OPTS.DAPP_APPROVE_SCREEN_EDIT_FEE);
+		this.setState({ customGasVisible: !customGasVisible, gasError: undefined });
 	};
 
 	toggleEditPermission = () => {
@@ -432,7 +433,7 @@ class Approve extends PureComponent {
 		const { setTransactionObject, conversionRate } = this.props;
 
 		if (!customGas || !customGasPrice) {
-			this.toggleCustomGasModal();
+			this.toggleCustomGas();
 			return;
 		}
 		this.setState({ gasEstimationReady: false });
@@ -451,41 +452,26 @@ class Approve extends PureComponent {
 				totalGasFiat: weiToFiatNumber(totalGas, conversionRate)
 			});
 		}, 100);
-		this.toggleCustomGasModal();
+		this.toggleCustomGas();
 	};
 
 	handleGasFeeSelection = ({ gas, gasPrice, customGasSelected, error }) => {
 		this.setState({ customGas: gas, customGasPrice: gasPrice, customGasSelected, gasError: error });
 	};
 
-	renderCustomGasModal = () => {
-		const { customGasModalVisible, currentCustomGasSelected, gasError } = this.state;
+	renderCustomGas = () => {
+		const { currentCustomGasSelected, gasError } = this.state;
 		const { gas, gasPrice } = this.props.transaction;
 		return (
-			<Modal
-				isVisible={customGasModalVisible}
-				animationIn="slideInUp"
-				animationOut="slideOutDown"
-				style={styles.bottomModal}
-				backdropOpacity={0.7}
-				animationInTiming={600}
-				animationOutTiming={600}
-				onBackdropPress={this.toggleCustomGasModal}
-				onBackButtonPress={this.toggleCustomGasModal}
-				onSwipeComplete={this.toggleCustomGasModal}
-				swipeDirection={'down'}
-				propagateSwipe
-			>
-				<CustomGas
-					selected={currentCustomGasSelected}
-					handleGasFeeSelection={this.handleGasFeeSelection}
-					gas={gas}
-					gasPrice={gasPrice}
-					gasError={gasError}
-					toggleCustomGasModal={this.toggleCustomGasModal}
-					handleSetGasFee={this.handleSetGasFee}
-				/>
-			</Modal>
+			<CustomGas
+				selected={currentCustomGasSelected}
+				handleGasFeeSelection={this.handleGasFeeSelection}
+				gas={gas}
+				gasPrice={gasPrice}
+				gasError={gasError}
+				toggleCustomGasModal={this.toggleCustomGas}
+				handleSetGasFee={this.handleSetGasFee}
+			/>
 		);
 	};
 
@@ -727,6 +713,7 @@ class Approve extends PureComponent {
 			host,
 			tokenSymbol,
 			viewDetails,
+			customGasVisible,
 			totalGas,
 			// totalGasFiat,
 			// ticker,
@@ -825,6 +812,8 @@ class Approve extends PureComponent {
 							</>
 						) : editPermissionVisible ? (
 							this.renderEditPermission()
+						) : customGasVisible ? (
+							this.renderCustomGas()
 						) : (
 							<>
 								<View style={styles.section} testID={'approve-screen'}>
@@ -855,7 +844,7 @@ class Approve extends PureComponent {
 										</Text>
 										<TouchableOpacity
 											style={styles.sectionRight}
-											onPress={this.toggleCustomGasModal}
+											onPress={this.toggleCustomGas}
 										>
 											<Text style={styles.editText}>{strings('transaction.edit')}</Text>
 										</TouchableOpacity>
@@ -873,7 +862,7 @@ class Approve extends PureComponent {
 											<Text style={styles.feeText}>{`${totalGas} ${ticker}`}</Text>
 										</View>
 									</View>*/}
-									<TouchableOpacity onPress={this.toggleCustomGasModal}>
+									<TouchableOpacity onPress={this.toggleCustomGas}>
 										<View style={styles.networkFee}>
 											<Text style={styles.sectionRight}>
 												{strings('transaction.transaction_fee')}
@@ -915,7 +904,6 @@ class Approve extends PureComponent {
 								</View>
 							</>
 						)}
-						{this.renderCustomGasModal()}
 					</View>
 				</Modal>
 			</SafeAreaView>
