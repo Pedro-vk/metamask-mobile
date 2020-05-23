@@ -29,7 +29,8 @@ import {
 	getTicker,
 	decodeTransferData,
 	generateApproveData,
-	getNormalizedTxState
+	getNormalizedTxState,
+	getNormalizedMethodName
 } from '../../../../util/transactions';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import ErrorMessage from '../../SendFlow/ErrorMessage';
@@ -297,6 +298,7 @@ class Approve extends PureComponent {
 		editPermissionVisible: false,
 		gasError: undefined,
 		host: undefined,
+		method: undefined,
 		originalApproveAmount: undefined,
 		originalTransactionData: this.props.transaction.data,
 		totalGas: undefined,
@@ -333,6 +335,7 @@ class Approve extends PureComponent {
 		const totalGas = gas.mul(gasPrice);
 		this.setState({
 			host,
+			method: await getNormalizedMethodName(data),
 			originalApproveAmount,
 			tokenDecimals,
 			tokenSymbol,
@@ -666,6 +669,7 @@ class Approve extends PureComponent {
 		} = this.props;
 		const {
 			host,
+			method,
 			tokenSymbol,
 			viewDetails,
 			viewData,
@@ -705,6 +709,7 @@ class Approve extends PureComponent {
 								allowance={amount}
 								tokenSymbol={tokenSymbol}
 								data={transaction.data}
+								method={method}
 								displayViewData={viewData}
 							/>
 						) : editPermissionVisible ? (
