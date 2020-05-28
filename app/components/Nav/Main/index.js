@@ -1155,7 +1155,7 @@ class Main extends PureComponent {
 				{this.renderSigningModal()}
 				{this.renderWalletConnectSessionRequestModal()}
 				{this.renderWalletConnectReturnModal()}
-				{this.state.dappTransactionModalVisible && this.renderDappTransactionModal()}
+				{this.renderDappTransactionModal()}
 			</React.Fragment>
 		);
 	}
